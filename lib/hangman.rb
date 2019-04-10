@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Game
 
   def initialize
@@ -24,6 +26,7 @@ class Game
     display_gameover
 
   end
+
   def load_game
     #loads game from a file
     #reassigns word, word_array, lives, empty_chr, and guesses
@@ -49,16 +52,19 @@ class Game
       prelim = "$" if prelim == ""
       is_letter = (97..122).include?(prelim.ord)
       is_guessed = @guesses.include?(prelim)
-      if is_letter && !is_guessed
-        valid = prelim.length == 1
+      if is_letter && !is_guessed && prelim.length == 1
+        valid = true
+      elsif prelim == "save"
+        puts "saving..."
+        save_game
+        puts "Game saved!"
+        print "Next guess?"
       else
         puts "Please input a letter that you haven't guessed yet!"
       end
     end
     return prelim
   end
-
-#nil input
 
   def display_ui
     #clears screen
@@ -67,6 +73,7 @@ class Game
     draw_hidden_word
     draw_guessed
     draw_lives
+    puts "enter 'save' to save the game"
   end
 
   def draw_hidden_word
@@ -116,9 +123,24 @@ class Game
     end
   end
 
+  def save_game
+    data = YAML.dump ({
+      :word => @word,
+      :word_array => @word_array,
+      :guesses => @guesses,
+      :lives => @lives,
+    })
 
+    file = File.open("save.yaml","w")
+    file.puts data
+    file.close
+  end
 
-
+  def self.from_yaml(string)
+    data = YAML.load string
+    p data
+    self.new(data[:name], data[:age], data[:gender])
+  end
 
 end
 
