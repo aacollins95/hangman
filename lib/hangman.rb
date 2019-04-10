@@ -6,9 +6,7 @@ class Game
     @root = "/home/aaron/TOP/ruby_programming/hangman/"
     @empty_chr = "_"
     @word = get_word
-    puts @word
     @word_array = Array.new(@word.length,@empty_chr)
-    puts @word.length
     @lives = 5
     @game_over = false
     @guesses = []
