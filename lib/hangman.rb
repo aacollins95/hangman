@@ -27,12 +27,6 @@ class Game
 
   end
 
-  def load_game
-    #loads game from a file
-    #reassigns word, word_array, lives, empty_chr, and guesses
-    pass
-  end
-
   def get_word
     #loads file, chooses a random word between 5 and 12 letters long
     puts "Generating random word..."
@@ -55,10 +49,9 @@ class Game
       if is_letter && !is_guessed && prelim.length == 1
         valid = true
       elsif prelim == "save"
-        puts "saving..."
         save_game
-        puts "Game saved!"
-        print "Next guess?"
+      elsif prelim == "load" && @guesses == []
+        load_game
       else
         puts "Please input a letter that you haven't guessed yet!"
       end
@@ -73,7 +66,9 @@ class Game
     draw_hidden_word
     draw_guessed
     draw_lives
-    puts "enter 'save' to save the game"
+    data = 'save'
+    data = 'load' if @guesses == []
+    puts "enter '#{data}' to #{data} the game"
   end
 
   def draw_hidden_word
@@ -124,6 +119,8 @@ class Game
   end
 
   def save_game
+    #saves variables as a yaml string
+    puts "saving..."
     data = YAML.dump ({
       :word => @word,
       :word_array => @word_array,
@@ -134,12 +131,18 @@ class Game
     file = File.open("save.yaml","w")
     file.puts data
     file.close
+    puts "Game saved!"
+    print "Next guess?"
   end
 
-  def self.from_yaml(string)
-    data = YAML.load string
-    p data
-    self.new(data[:name], data[:age], data[:gender])
+  def load_game
+    data = YAML.load(File.open('save.yaml','r').read)
+    @word = data[:word]
+    @word_array = data[:word_array]
+    @guesses = data[:guesses]
+    @lives = data[:lives]
+    display_ui
+    print "Next guess?"
   end
 
 end
